@@ -1,11 +1,11 @@
-const Router = require("@koa/router");
-const blog = require("./blog");
-const { dbActive, statusHandler } = require("./status");
+import Router from "@koa/router";
+import blog from "./post.js";
+import { dbActive, statusHandler } from "./status.js";
 
 const apiRouter = new Router({ prefix: "/api" });
 
 apiRouter.get("/status", statusHandler);
-apiRouter.use("/blog", dbActive, blog.routes());
+apiRouter.use("/post", dbActive, blog.routes());
 
 //handle success
 apiRouter.use((ctx, next) => {
@@ -16,4 +16,4 @@ apiRouter.use((ctx, next) => {
   ctx.body = { ...body, success };
 });
 
-module.exports = apiRouter;
+export default apiRouter;

@@ -1,14 +1,10 @@
-const Koa = require("koa");
-const apiRouter = require("./routers");
+import Koa from "koa";
+import apiRouter from "./routers/index.js";
 
-const { dbInit, dbStatus, db } = require("./dbInit");
-const { serverPort, mongoUrl } = require("./cfg");
+import { connectToMongo } from "./dbInit.js";
+import { serverPort, mongoUrl } from "./cfg.js";
 
-dbInit(mongoUrl);
-
-const appStatus = {
-  dbStatus,
-};
+connectToMongo(mongoUrl);
 
 const app = new Koa();
 

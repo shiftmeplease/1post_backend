@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const dbStatus = {
+export const dbStatus = {
   active: false,
   message: `initial state at ${new Date().toISOString()}`,
 };
-let db = {};
+export let db = {};
 
 function switchStatus(action) {
   const info = `${action} at ${new Date().toISOString()}`;
@@ -23,7 +23,7 @@ function switchStatus(action) {
   }
 }
 
-function connectToMongo(mongoUrl) {
+export function connectToMongo(mongoUrl) {
   mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -47,5 +47,3 @@ function connectToMongo(mongoUrl) {
 
   return { db, dbStatus };
 }
-
-module.exports = { dbInit: connectToMongo, db, dbStatus };

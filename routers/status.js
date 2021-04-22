@@ -1,6 +1,6 @@
-const { dbStatus } = require("../dbInit");
+import { dbStatus } from "../dbInit.js";
 
-const statusHandler = async (ctx, next) => {
+export const statusHandler = async (ctx, next) => {
   if (dbStatus) {
     ctx.success = true;
     ctx.body = { dbStatus };
@@ -8,12 +8,10 @@ const statusHandler = async (ctx, next) => {
   next();
 };
 
-const dbActive = async (ctx, next) => {
+export const dbActive = async (ctx, next) => {
   if (dbStatus.active) {
     return next();
   }
   ctx.success = false;
   ctx.body = { message: "db disconnected" };
 };
-
-module.exports = { statusHandler, dbActive };

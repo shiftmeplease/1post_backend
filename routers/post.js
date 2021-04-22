@@ -1,4 +1,4 @@
-const Router = require("@koa/router");
+import Router from "@koa/router";
 
 const blog = new Router({ methods: ["POST", "GET", "DELETE", "PUT"] });
 
@@ -25,5 +25,4 @@ blog.del("/", async (ctx, next) => {});
 //preview, all posts
 //full info of post
 //delete post
-
-module.exports = blog;
+export default blog;
