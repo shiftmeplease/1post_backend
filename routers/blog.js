@@ -3,8 +3,10 @@ const Router = require("@koa/router");
 const blog = new Router({ methods: ["POST", "GET", "DELETE", "PUT"] });
 
 //get post by id
-blog.get("/", async (ctx) => {
-  ctx.body = [1, 2, 3, 4];
+blog.get("/", async (ctx, next) => {
+  ctx.success = true;
+  ctx.body = { result: [1, 2, 3, 4] };
+  next();
 });
 
 // //get posts, paginated by id

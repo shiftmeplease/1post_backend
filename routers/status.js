@@ -1,8 +1,6 @@
-//return website status
-
 const { dbStatus } = require("../dbInit");
 
-const status = async (ctx, next) => {
+const statusHandler = async (ctx, next) => {
   if (dbStatus) {
     ctx.success = true;
     ctx.body = { dbStatus };
@@ -10,4 +8,12 @@ const status = async (ctx, next) => {
   next();
 };
 
-module.exports = status;
+const dbActive = async (ctx, next) => {
+  if (dbStatus.active) {
+    return next();
+  }
+  ctx.success = false;
+  ctx.body = { message: "db disconnected" };
+};
+
+module.exports = { statusHandler, dbActive };
