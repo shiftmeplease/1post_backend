@@ -33,13 +33,18 @@ postSchema.plugin(AutoIncrement);
 
 postSchema.statics.random = async function (num) {
   const amount = await this.countDocuments();
-  const random = [];
-  for (let i = 0; i < num; i++) {
-    //TODO make non duplicated
-    random.push({ _id: getRandom(amount) });
-    // this.findOne().skip(rand).exec(callback);
+  if (num > 3 || num >= amount) {
+    throw new Error("Random >= amount documents || Random > 3");
   }
-  return random;
+
+  const rndArr = [];
+  for (let i = 0; i < num; i++) {
+    rndArr[i] = getRandom(amount, rndArr);
+  }
+
+  return rndArr.map((val) => {
+    return { _id: val };
+  });
 };
 
 postSchema.methods.findDupe = async function () {
@@ -53,10 +58,13 @@ postSchema.methods.findDupe = async function () {
 
 const Post = mongoose.model("Post", postSchema);
 
-function getRandom(max) {
+function getRandom(max, rndArr) {
   const min = 1;
-  let rand = min - 0.5 + Math.random() * (max - min + 1);
-  return Math.round(rand);
+  let rnd;
+  do {
+    rnd = Math.round(min - 0.5 + Math.random() * (max - min + 1));
+  } while (rndArr.indexOf(rnd) >= 0);
+  return rnd;
 }
 
 export default Post;

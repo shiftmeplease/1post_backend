@@ -55,6 +55,7 @@ async function removeById(ctx, next) {
   next();
 }
 
+//returns async middleware
 function findRandom(count = 1) {
   return async function (ctx, next) {
     const randomIds = await Post.random(count);

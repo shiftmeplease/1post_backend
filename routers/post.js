@@ -4,27 +4,18 @@ import * as Post from "../controllers/post.js";
 
 const post = new Router({ methods: ["POST", "GET", "DELETE", "PUT"] });
 
-post.get("/id/:postId", Post.getById);
-post.put("/", Post.save);
-post.del("/:postId", Post.removeById);
-post.get("/3random", Post.findRandom(3));
+post.get("/id/:postId", Post.getById); //get post by id, for sharing... //full info of post
+post.get("/3random", Post.findRandom(3)); // 3 random posts for main page
 post.get("/lucky", Post.findRandom());
 
-//im feeling lucky
-//get post by id, for sharing...
+post.put("/", Post.save); //create post
 
-// //get posts, paginated by id
-// blog.get("/", (ctx) => {});
+post.del("/:postId", Post.removeById);
 
-// //search posts, paginated by id
-// blog.get("/", (ctx) => {});
+//get posts, paginated by id; //preview, all posts
 
-// 3 random posts for main page
+//search posts, paginated
 
-//create post
-//preview, all posts
-//full info of post
-//delete post
 //search special computed tags: laconic, nigger, blm, etc..
 //https://medium.com/dida-machine-learning/the-best-free-labeling-tools-for-text-annotation-in-nlp-844525c5c65b
 export default post;
