@@ -1,10 +1,15 @@
 import mongoose from "mongoose";
+import AutoIncrementFactory from "mongoose-sequence";
+
+const { connection } = mongoose;
 
 export const dbStatus = {
   active: false,
   message: `initial state at ${new Date().toISOString()}`,
 };
-export let db = {};
+
+export let db = connection;
+export let AutoIncrement = AutoIncrementFactory(connection);
 
 function switchStatus(action) {
   const info = `${action} at ${new Date().toISOString()}`;
@@ -27,9 +32,9 @@ export function connectToMongo(mongoUrl) {
   mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
   });
-
-  db = mongoose.connection;
 
   db.on("error", (err) => {
     console.log(err.message);
@@ -44,6 +49,4 @@ export function connectToMongo(mongoUrl) {
   db.on("open", () => {
     switchStatus("open");
   });
-
-  return { db, dbStatus };
 }

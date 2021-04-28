@@ -1,4 +1,4 @@
 {
-    "ignore": ["node_modules/*", "package*"],
-    "delay": "400"
+  "ignore": ["node_modules/*", "package*"],
+  "delay": "400"
 }
