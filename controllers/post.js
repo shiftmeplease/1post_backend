@@ -79,18 +79,33 @@ function findRandom(count = 1) {
 }
 
 async function getPage(ctx, next) {
-  let { pageNum = 0 } = ctx.params;
+  let { sortType = "newest", pageNum = 0 } = ctx.request.body;
+  if (!sortType || !Number.isInteger(pageNum))
+    ctx.throw(400, "Invalid request");
+
   if (!/^\d+$/.test(pageNum)) ctx.throw(404, "Page not found");
-  pageNum = Math.floor(+pageNum);
+  if (["newest", "oldest"].indexOf(sortType) === -1)
+    ctx.throw(404, "Invalid sortType");
+
+  let sortQuery;
+  switch (sortType) {
+    case "newest":
+      sortQuery = { _id: "desc" };
+      break;
+    case "oldest":
+      sortQuery = { _id: "asc" };
+      break;
+  }
+
+  // pageNum = Math.floor(+pageNum);
   if (pageNum < 0) {
     ctx.throw(404, "Page not found");
-  }
-  if (pageNum !== 0) {
+  } else if (pageNum !== 0) {
     pageNum -= 1;
   }
 
   const posts = await Post.find()
-    .sort({ _id: "desc" })
+    .sort(sortQuery)
     .select("id date body")
     .setOptions({ skip: pageNum * 3, limit: 3 })
     .exec();

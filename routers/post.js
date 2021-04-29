@@ -7,7 +7,7 @@ const post = new Router({ methods: ["POST", "GET", "DELETE", "PUT"] });
 post.get("/id/:postId", Post.getById); //get post by id, for sharing... //full info of post
 post.get("/3random", Post.findRandom(3)); // 3 random posts for main page
 post.get("/lucky", Post.findRandom());
-post.get("/page/:pageNum*", Post.getPage);
+post.post("/page/:pageNum*", Post.getPage);
 
 post.put("/", Post.save); //create post
 
