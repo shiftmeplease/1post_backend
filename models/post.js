@@ -68,3 +68,7 @@ function getRandom(max, rndArr) {
 }
 
 export default Post;
+
+//TODO search special computed tags: laconic, nigger, blm, etc..
+//https://medium.com/dida-machine-learning/the-best-free-labeling-tools-for-text-annotation-in-nlp-844525c5c65b
+//https://azure.microsoft.com/ru-ru/pricing/details/cognitive-services/text-analytics/

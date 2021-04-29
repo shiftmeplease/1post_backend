@@ -78,6 +78,30 @@ function findRandom(count = 1) {
   };
 }
 
+async function getPage(ctx, next) {
+  let { pageNum = 0 } = ctx.params;
+  if (!/^\d+$/.test(pageNum)) ctx.throw(404, "Page not found");
+  pageNum = Math.floor(+pageNum);
+  if (pageNum < 0) {
+    ctx.throw(404, "Page not found");
+  }
+  if (pageNum !== 0) {
+    pageNum -= 1;
+  }
+
+  const posts = await Post.find()
+    .sort({ _id: "desc" })
+    .select("id date body")
+    .setOptions({ skip: pageNum * 3, limit: 3 })
+    .exec();
+  if (posts.length <= 0) {
+    ctx.throw("No more posts");
+  }
+  ctx.success = true;
+  ctx.body = { posts: posts };
+  next();
+}
+
 // import { save as saveIp } from "../controllers/ip.js";
 // import { ipBan } from "../cfg.js";
 
@@ -90,4 +114,4 @@ function findRandom(count = 1) {
 //   next();
 // };
 
-export { save, getById, removeById, findRandom };
+export { save, getById, removeById, findRandom, getPage };
