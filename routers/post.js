@@ -8,12 +8,11 @@ post.get("/id/:postId", Post.getById); //get post by id, for sharing... //full i
 post.get("/3random", Post.findRandom(3)); // 3 random posts for main page
 post.get("/lucky", Post.findRandom());
 post.post("/page/:pageNum*", Post.getPage);
+post.post("/search", Post.search);
 
 post.put("/", Post.save); //create post
 
 post.del("/:postId", Post.removeById);
-
-//get posts, paginated by id; //preview, all posts
 
 //search posts, paginated
 

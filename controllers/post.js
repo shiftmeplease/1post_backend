@@ -117,6 +117,34 @@ async function getPage(ctx, next) {
   next();
 }
 
+//search
+
+async function search(ctx, next) {
+  let { text } = ctx.request.body;
+  if (!text || !typeof text === "string") ctx.throw(400, "Invalid request");
+
+  if (/\n|\r\n/.test(text)) ctx.throw(400, "Invalid text search");
+
+  const posts = await Post.find({ $text: { $search: text } })
+    .select("id date body")
+    .setOptions({ limit: 10 })
+    .sort({
+      score: { $meta: "textScore" },
+    })
+    .exec();
+
+  if (posts.length <= 0) {
+    ctx.throw(404, "Nothing found");
+  }
+  ctx.success = true;
+  ctx.body = { posts: posts };
+  next();
+}
+
+// Post.find(
+//   { $text: { $search: "cake" } }
+// ).sort( { score: { $meta: "textScore" } } )
+
 // import { save as saveIp } from "../controllers/ip.js";
 // import { ipBan } from "../cfg.js";
 
@@ -129,4 +157,4 @@ async function getPage(ctx, next) {
 //   next();
 // };
 
-export { save, getById, removeById, findRandom, getPage };
+export { save, getById, removeById, findRandom, getPage, search };

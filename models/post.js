@@ -4,7 +4,7 @@ import { AutoIncrement } from "../dbInit.js";
 
 const postSchema = new Schema(
   {
-    _id: Number,
+    _id: { type: Number },
     body: {
       type: String,
       minLength: [3, "Possible post length is 3-100"],
@@ -18,10 +18,12 @@ const postSchema = new Schema(
         },
         message: `More than 10 lines`,
       },
+      text: true,
     },
     // ip: { type: Schema.Types.ObjectId, ref: "IpEntry" },
     //   comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
     // views: { type: Number, default: 0 },
+    //TODO timezones support?
     date: { type: Date, default: Date.now },
     // hidden: Boolean,
     // country: { type: String, index: true },
