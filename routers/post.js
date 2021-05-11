@@ -1,5 +1,6 @@
 import Router from "@koa/router";
 import * as Post from "../controllers/post.js";
+import * as Ip from "../controllers/ip.js";
 // import { handleError } from "../koaUtils.js";
 
 const post = new Router({ methods: ["POST", "GET", "DELETE", "PUT"] });
@@ -10,10 +11,10 @@ post.get("/lucky", Post.findRandom());
 post.post("/page/:pageNum*", Post.getPage);
 post.post("/search", Post.search);
 
-post.put("/", Post.save); //create post
+post.put("/", Ip.validate, Post.save); //create post
 
 post.del("/:postId", Post.removeById);
 
-//search posts, paginated
+//TODO better input control
 
 export default post;

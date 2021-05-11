@@ -6,6 +6,8 @@ async function save(ctx, next) {
   const { body } = ctx.request.body;
   if (!body) ctx.throw(500, "Empty post");
 
+  // await geoip.lookup
+
   const newPost = new Post({ body });
 
   await newPost.validate();
@@ -107,7 +109,7 @@ async function getPage(ctx, next) {
   const posts = await Post.find()
     .sort(sortQuery)
     .select("id date body")
-    .setOptions({ skip: pageNum * 3, limit: 3 })
+    .setOptions({ skip: pageNum * 10, limit: 10 })
     .exec();
   if (posts.length <= 0) {
     ctx.throw("No more posts");

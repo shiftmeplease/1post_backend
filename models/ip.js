@@ -14,6 +14,9 @@ const ipSchema = new Schema({
       message: `Invalid IP`,
     },
   },
+  country: {
+    type: String,
+  },
 });
 
 const IpEntry = mongoose.model("IpEntry", ipSchema);

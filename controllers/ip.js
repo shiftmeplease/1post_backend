@@ -1,19 +1,23 @@
 import IpEntry from "../models/ip.js";
 import faker from "faker";
+import * as geoip from "fast-geoip";
+
 const {
   internet: { ip: randomIp },
 } = faker;
 
-async function save(ctx, next) {
+async function validate(ctx, next) {
   //TODO disable mock ip
-  // ipString = randomIp();
-  const newIp = new IpEntry({ ip: ipString });
+  ipString = randomIp();
+  const country = await geoip.lookup(ipString);
+  const newIp = new IpEntry({ ip: ipString, country });
 
   ipString = await newIp.validate();
   try {
     const result = await newIp.save();
-    //TODO response
-    return; //
+    //TODO add objectId to state
+    ctx.state = { ...ctx.state, ip: { country, string: ipString } };
+    next();
   } catch (e) {
     const { code } = e;
     if (code === 11000) {
@@ -24,4 +28,4 @@ async function save(ctx, next) {
   }
 }
 
-export { save };
+export { validate };
