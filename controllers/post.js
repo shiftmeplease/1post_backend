@@ -1,24 +1,37 @@
 import Post from "../models/post.js";
+import DOMPurify from "dompurify";
+import MarkdownIt from "markdown-it";
+
+//TODO better preview;  with styles;
+const md = MarkdownIt();
+
+//workaround to make work in nodejs
+import { JSDOM } from "jsdom";
+const { window } = new JSDOM("<!DOCTYPE html>");
+const domPurify = DOMPurify(window);
+
+const selectedFields = "id date value country";
 
 async function save(ctx, next) {
-  //TODO checkIp
+  const { value } = ctx.request.body;
+  const {
+    ip: { _id: ipId, country },
+  } = ctx.state;
+  if (!value) ctx.throw(500, "Empty post");
 
-  const { body } = ctx.request.body;
-  if (!body) ctx.throw(500, "Empty post");
-
-  // await geoip.lookup
-
-  const newPost = new Post({ body });
+  const postHtml = domPurify.sanitize(md.render(value));
+  const newPost = new Post({ value: postHtml, ip: ipId, country });
 
   await newPost.validate();
   await newPost.findDupe();
+
   try {
     const result = await newPost.save();
     //populate to _id, date
-    const { _id: id, date } = result;
-    ctx.body = { post: { id, date } };
+    const { _id, date } = result;
+    ctx.body = { post: { _id, date, country, value: postHtml } };
     ctx.success = true;
-    next();
+    return next();
   } catch (e) {
     const { code } = e;
     if (code === 11000) {
@@ -34,13 +47,13 @@ async function getById(ctx, next) {
 
   if (!/^\d+$/.test(postId)) ctx.throw(400, "Invalid postId");
 
-  const resultPost = await Post.findById(postId, "-_id body date").exec();
+  const resultPost = await Post.findById(postId, selectedFields).exec();
   if (!resultPost && resultPost === null) {
     return ctx.throw(404, "Post not found");
   }
   ctx.success = true;
   ctx.body = { post: resultPost };
-  next();
+  return next();
 }
 
 async function removeById(ctx, next) {
@@ -54,7 +67,7 @@ async function removeById(ctx, next) {
   }
   ctx.success = true;
   ctx.body = { message: `Removed post with id: ${postId}` };
-  next();
+  return next();
 }
 
 //returns async middleware
@@ -63,7 +76,7 @@ function findRandom(count = 1) {
     const randomIds = await Post.random(count);
     const randomPosts = await Post.find(
       { $or: randomIds },
-      "-_id body date"
+      selectedFields
     ).exec();
     if (!randomPosts && randomPosts.length === 0) {
       return ctx.throw(404, "Posts not found");
@@ -76,7 +89,7 @@ function findRandom(count = 1) {
       ctx.body = { posts: randomPosts };
     }
 
-    next();
+    return next();
   };
 }
 
@@ -108,7 +121,7 @@ async function getPage(ctx, next) {
 
   const posts = await Post.find()
     .sort(sortQuery)
-    .select("id date body")
+    .select(selectedFields)
     .setOptions({ skip: pageNum * 10, limit: 10 })
     .exec();
   if (posts.length <= 0) {
@@ -116,7 +129,7 @@ async function getPage(ctx, next) {
   }
   ctx.success = true;
   ctx.body = { posts: posts };
-  next();
+  return next();
 }
 
 //search
@@ -128,7 +141,7 @@ async function search(ctx, next) {
   if (/\n|\r\n/.test(text)) ctx.throw(400, "Invalid text search");
 
   const posts = await Post.find({ $text: { $search: text } })
-    .select("id date body")
+    .select(selectedFields)
     .setOptions({ limit: 10 })
     .sort({
       score: { $meta: "textScore" },
@@ -140,7 +153,7 @@ async function search(ctx, next) {
   }
   ctx.success = true;
   ctx.body = { posts: posts };
-  next();
+  return next();
 }
 
 // Post.find(
@@ -156,7 +169,7 @@ async function search(ctx, next) {
 //     const result = await saveIp(ip);
 //     //TODO ipRef to ctx, or make transactions
 //   }
-//   next();
+//   return next();
 // };
 
 export { save, getById, removeById, findRandom, getPage, search };

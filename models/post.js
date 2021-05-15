@@ -5,11 +5,11 @@ import { AutoIncrement } from "../dbInit.js";
 const postSchema = new Schema(
   {
     _id: { type: Number },
-    body: {
+    value: {
       type: String,
       minLength: [3, "Possible post length is 3-100"],
       maxLength: [100, "Possible post length is 3-100"],
-      unique: [true, "Same post already created"],
+      // unique: [true, "Same post already created"],
       validate: {
         //TODO markdown validator
         validator: function (value) {
@@ -20,13 +20,13 @@ const postSchema = new Schema(
       },
       text: true,
     },
-    // ip: { type: Schema.Types.ObjectId, ref: "IpEntry" },
+    ip: { type: Schema.Types.ObjectId, ref: "IpEntry" },
     //   comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
     // views: { type: Number, default: 0 },
     //TODO timezones support?
     date: { type: Date, default: Date.now },
     // hidden: Boolean,
-    // country: { type: String, index: true },
+    country: { type: String, index: true },
   },
   { _id: false }
 );
@@ -50,8 +50,8 @@ postSchema.statics.random = async function (num) {
 };
 
 postSchema.methods.findDupe = async function () {
-  const { body } = this;
-  const result = await mongoose.model("Post").findOne({ body });
+  const { value } = this;
+  const result = await mongoose.model("Post").findOne({ value });
   if (!result || result === null) {
     return;
   }

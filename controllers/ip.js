@@ -7,17 +7,20 @@ const {
 } = faker;
 
 async function validate(ctx, next) {
+  let ipString = ctx.request.headers["x-real-ip"];
   //TODO disable mock ip
   ipString = randomIp();
-  const country = await geoip.lookup(ipString);
+  const { country } = await geoip.lookup(ipString);
   const newIp = new IpEntry({ ip: ipString, country });
+  await newIp.validate();
 
-  ipString = await newIp.validate();
   try {
-    const result = await newIp.save();
-    //TODO add objectId to state
-    ctx.state = { ...ctx.state, ip: { country, string: ipString } };
-    next();
+    const document = await newIp.save();
+    ctx.state = {
+      ...ctx.state,
+      ip: { country, string: ipString, _id: document._id },
+    };
+    return next();
   } catch (e) {
     const { code } = e;
     if (code === 11000) {

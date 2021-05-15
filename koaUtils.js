@@ -3,6 +3,8 @@ const handleError = async (ctx, next) => {
     await next();
   } catch (err) {
     console.log("Error in router: " + err);
+    //todo remove stack
+    console.log(err);
 
     ctx.type = "json";
     ctx.status = err.statusCode || err.status || 500;
