@@ -3,7 +3,21 @@ import DOMPurify from "dompurify";
 import MarkdownIt from "markdown-it";
 
 //TODO better preview;  with styles;
-const md = MarkdownIt();
+
+const md = MarkdownIt("zero", { linkify: true });
+md.enable(["normalize", "block", "inline", "linkify", "smartquotes"]);
+md.enable([
+  "blockquote", // >>>  // <blockquote>
+  "heading", // # <h1 -h6>
+]);
+md.enable([
+  "link", //[link](<to> "stuff")  // <a> ?
+  "backticks", // ` ``` // <code>
+  "strikethrough", // ~~ ff ~~ // <s>
+  "emphasis", // / *this* and _that_
+  "image", // /![Minion](https://octodex.github.com/images/minion.png)
+  "autolink",
+]);
 
 //workaround to make work in nodejs
 import { JSDOM } from "jsdom";
@@ -20,9 +34,9 @@ async function save(ctx, next) {
   if (!value) ctx.throw(500, "Empty post");
 
   const postHtml = domPurify.sanitize(md.render(value));
-  const newPost = new Post({ value: postHtml, ip: ipId, country });
+  const newPost = new Post({ value: postHtml, md: value, ip: ipId, country });
 
-  await newPost.validate();
+  await newPost.validateMd();
   await newPost.findDupe();
 
   try {

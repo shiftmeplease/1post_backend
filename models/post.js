@@ -7,17 +7,21 @@ const postSchema = new Schema(
     _id: { type: Number },
     value: {
       type: String,
-      minLength: [3, "Possible post length is 3-100"],
-      maxLength: [100, "Possible post length is 3-100"],
-      // unique: [true, "Same post already created"],
-      validate: {
-        //TODO markdown validator
-        validator: function (value) {
-          const lines = value.split("\n").length;
-          return lines <= 10;
-        },
-        message: `More than 10 lines`,
-      },
+      text: true,
+    },
+    md: {
+      type: String,
+      // minLength: [1, "Possible post length is 1-300"],
+      // maxLength: [300, "Possible post length is 1-300"],
+
+      // validate: {
+      //   //TODO markdown validator
+      //   validator: function (value) {
+      //     const lines = value.split("\n").length;
+      //     return lines <= 15;
+      //   },
+      //   message: `Message is more than 15 lines`,
+      // },
       text: true,
     },
     ip: { type: Schema.Types.ObjectId, ref: "IpEntry" },
@@ -56,6 +60,20 @@ postSchema.methods.findDupe = async function () {
     return;
   }
   throw new Error("Same post already created");
+};
+
+postSchema.methods.validateMd = async function () {
+  const { md } = this;
+
+  if (md.length > 300 || md.length < 1) {
+    console.log(md.length);
+    throw new Error("Possible post length is 1-300");
+  }
+  if (md.split("\n").length > 15) {
+    console.log(md.split("\n").length);
+    throw new Error("Message is more than 15 lines");
+  }
+  return true;
 };
 
 const Post = mongoose.model("Post", postSchema);
