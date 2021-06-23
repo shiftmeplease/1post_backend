@@ -17,6 +17,7 @@ md.enable([
   "emphasis", // / *this* and _that_
   "image", // /![Minion](https://octodex.github.com/images/minion.png)
   "autolink",
+  "escape"
 ]);
 
 //workaround to make work in nodejs
